@@ -131,13 +131,16 @@ public class XMTPModule: Module {
 			}
 			
 			let privateKeyBundle = client.privateKeyBundle
-			let key = if (keyType == "prekey") {
-				privateKeyBundle.v2.preKeys[preKeyIndex]
-			} else {
-				privateKeyBundle.v2.identityKey
-			}
-			let signature = await PrivateKey(key).sign(Data(digest))
-			return Array(Data(signature))
+
+			let key = keyType == "prekey" ? privateKeyBundle.v2.preKeys[preKeyIndex] : privateKeyBundle.v2.identityKey
+			let privateKey = try PrivateKey(key)
+			let digestData = Data(digest)
+			let sig = try await privateKey.sign(digestData)
+//                guard let signature = try await PrivateKey(key).sign(Data(digest)) else {
+//                    throw Error.invalidSignature
+//                }
+			let bundle = try sig.serializedData()
+			return Array(bundle)
 		}
 		
 		AsyncFunction("exportPublicKeyBundle") { (clientAddress: String) -> [UInt8] in
