@@ -104,6 +104,8 @@ export default class Conversations<ContentTypes> {
   async streamAllMessages(
     callback: (message: DecodedMessage) => Promise<void>
   ): Promise<void> {
+    alert?.('XMTP streamAllMessages called')
+
     XMTPModule.subscribeToAllMessages(this.client.address)
     XMTPModule.emitter.addListener(
       'message',
@@ -114,14 +116,19 @@ export default class Conversations<ContentTypes> {
         clientAddress: string
         message: DecodedMessage
       }) => {
+        alert?.('XMTP streamAllMessages emitted message')
+        console.log(`clientAddress: ${clientAddress} this.client.address: ${this.client.address}`); // eslint-disable-line
         if (clientAddress !== this.client.address) {
+           console.log(`clientAddress !== this.client.address ${clientAddress} !== ${this.client.address}`);
           return
         }
         if (this.known[message.id]) {
+          console.log(`this.known[message.id] ${this.known[message.id]} ${message.id}`);
           return
         }
 
         this.known[message.id] = true
+        alert?.('XMTP streamAllMessages emitted message end')
         await callback(DecodedMessage.fromObject(message, this.client))
       }
     )
