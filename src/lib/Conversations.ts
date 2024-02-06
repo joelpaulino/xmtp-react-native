@@ -105,7 +105,7 @@ export default class Conversations<ContentTypes> {
     callback: (message: DecodedMessage) => Promise<void>
   ): Promise<void> {
     alert?.('XMTP streamAllMessages called')
-
+    console.log(`XMTP streamAllMessages called ${this.client.address}}`); // eslint-disable-line
     XMTPModule.subscribeToAllMessages(this.client.address)
     XMTPModule.emitter.addListener(
       'message',
